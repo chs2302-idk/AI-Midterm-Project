@@ -11,3 +11,15 @@
 ```
 Paste Here
 ```
+
+**Algorithm Name**
+
+```
+Paste Here
+```
+
+**Algorithm Name**
+
+```
+Paste Here
+```
