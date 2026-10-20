@@ -6,6 +6,15 @@
 | Valian Athalla Syahputra | 5025251156 | IUP |
 
 # Group 6 - Route Planning on Java Domestic Flight Network Using Uninformed Search Algorithms
+
+**Problem Introduction**
+
+Indonesia relies on air transportation to connect cities across its many islands. However, not every pair of cities has a direct flight, so passengers may need to transfer through other airports. Different routes can also have different ticket prices and numbers of flights, making it difficult to determine the most suitable route manually.
+
+This project models a domestic flight network from CGK (Soekarno-Hatta International Airport) to BWX (Banyuwangi Airport) as a weighted graph, where airports represent nodes, flight connections represent edges, and ticket prices represent edge weights.
+
+The project implements and compares three uninformed search algorithms: Breadth-First Search (BFS), Uniform-Cost Search (UCS), and Depth-First Search (DFS). The algorithms are evaluated based on the routes they find, total ticket costs, number of flights, expanded nodes, and execution time to understand the differences between their search strategies.
+
 **Algorithm Name**
 
 ```
