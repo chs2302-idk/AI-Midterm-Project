@@ -238,8 +238,8 @@ cd AI-Midterm-Project
 ```
  
 ### Step 2. Open a terminal in the project folder
-- **Windows:** open the folder, click the address bar, type `cmd`, and press Enter.
-- **Mac / Linux:** open Terminal and use `cd` to go to the folder.
+**Windows:** open the folder, click the address bar, type `cmd`, and press Enter.
+
 ### Step 3. Run one algorithm at a time
  
 ```bash
