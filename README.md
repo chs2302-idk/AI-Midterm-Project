@@ -17,6 +17,7 @@ The project implements and compares three uninformed search algorithms: Breadth-
 
 
 **Objectives**
+
 The objectives of this project are:
 
 * To represent a domestic flight network as a weighted graph.
@@ -49,6 +50,7 @@ The flight network is represented as a weighted graph consisting of seven airpor
 * BWX – Banyuwangi, the destination airport
 
 
+# Method
 
 **Uniform Cost Search (UCS)**
 ```
