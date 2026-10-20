@@ -7,7 +7,7 @@
 
 # Group 6 - Route Planning on Java Domestic Flight Network Using Uninformed Search Algorithms
 
-**Problem Introduction**
+### Problem Introduction
 
 Indonesia relies on air transportation to connect cities across its many islands. However, not every pair of cities has a direct flight, so passengers may need to transfer through other airports. Different routes can also have different ticket prices and numbers of flights, making it difficult to determine the most suitable route manually.
 
@@ -16,7 +16,7 @@ This project models a domestic flight network from CGK (Soekarno-Hatta Internati
 The project implements and compares three uninformed search algorithms: Breadth-First Search (BFS), Uniform-Cost Search (UCS), and Depth-First Search (DFS). The algorithms are evaluated based on the routes they find, total ticket costs, number of flights, expanded nodes, and execution time to understand the differences between their search strategies.
 
 
-**Objectives**
+### Objectives
 
 The objectives of this project are:
 
@@ -28,7 +28,7 @@ The objectives of this project are:
 
 * To evaluate algorithm performance using the number of expanded nodes and execution time.
 
-**Representation**
+### Representation
 
 <img width="1286" height="985" alt="WhatsApp Image 2026-10-20 at 8 00 05 AM" src="https://github.com/user-attachments/assets/38decb95-b518-4908-aa36-620d27128f5b" />
 
@@ -50,7 +50,7 @@ The flight network is represented as a weighted graph consisting of seven airpor
 * BWX – Banyuwangi, the destination airport
 
 
-# Method
+### Method
 
 **Uniform Cost Search (UCS)**
 ```
@@ -226,3 +226,32 @@ if __name__ == "__main__":
     print("Running time   : {:.4f} ms".format(elapsed_ms))
 
 ```
+
+## Experimental Results
+
+The three uninformed search algorithms were tested to find a route from Soekarno-Hatta International Airport (CGK) to Banyuwangi Airport (BWX).
+
+### Results Summary
+
+| Algorithm | Route | Number of Flights | Total Ticket Cost |
+|---|---|---:|---:|
+| BFS | CGK → SUB → BWX | 2 | Rp1,700,000 |
+| UCS | CGK → SRG → SUB → MLG → BWX | 4 | Rp1,400,000 |
+| DFS | CGK → BDO → YIA → MLG → BWX | 4 | Rp1,450,000 |
+
+### Discussion
+
+**Breadth-First Search (BFS)** finds a route with the fewest flights. In this experiment, it selects CGK → SUB → BWX, which requires only two flights. However, this route does not have the lowest ticket cost.
+
+**Uniform Cost Search (UCS)** considers the accumulated ticket cost when selecting a route. It finds CGK → SRG → SUB → MLG → BWX, with a total cost of Rp1,400,000. This is the cheapest route in the given graph.
+
+**Depth-First Search (DFS)** explores one path deeply before backtracking when necessary. Its result depends on the order in which neighboring airports are explored. In this experiment, it finds a route costing Rp1,450,000, but it does not guarantee the cheapest route or the route with the fewest flights.
+
+Overall, BFS is useful for minimizing the number of flights, UCS is suitable for minimizing ticket costs, and DFS demonstrates how exploration order affects the route found.
+
+## Conclusion
+
+This project demonstrates how BFS, UCS, and DFS can find different routes in a domestic flight network. BFS finds a route with the fewest flights, while UCS finds the route with the lowest total ticket cost. DFS explores paths according to its search order and does not guarantee an optimal result.
+
+Therefore, the most suitable algorithm depends on the traveler's needs. UCS is the best choice when minimizing ticket costs is the main priority, while BFS is more appropriate when minimizing the number of flights is important.
+
