@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Java Flight Route Search: BFS, DFS and UCS</title>
+<style>
+:root{--bg:#fff;--fg:#1f2937;--mut:#6b7280;--card:#f3f4f6;--bd:#d1d5db;--teal:#0f766e;--tealbg:#ccfbf1;--coral:#c2410c;--amber:#f59e0b;--blue:#2563eb;--edge:#9ca3af;--node:#fff;color-scheme:light dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111827;--fg:#e5e7eb;--mut:#9ca3af;--card:#1f2937;--bd:#374151;--tealbg:#134e4a;--edge:#6b7280;--node:#111827;--blue:#60a5fa}}
+:root[data-theme="dark"]{--bg:#111827;--fg:#e5e7eb;--mut:#9ca3af;--card:#1f2937;--bd:#374151;--tealbg:#134e4a;--edge:#6b7280;--node:#111827;--blue:#60a5fa;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
+main{max-width:920px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:20px 0 8px}
+p.sub{margin:0 0 14px;color:var(--mut);font-size:14px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.ctl label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:3px;flex:1 1 150px}
+select,button{font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg)}
+button{cursor:pointer}button:disabled{opacity:.4;cursor:default}
+button.pri{background:var(--teal);border-color:var(--teal);color:#fff}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.gbox{border:1px solid var(--bd);border-radius:12px;background:var(--bg);overflow:hidden}
+svg{display:block;width:100%;height:auto}
+.e{stroke:var(--edge);stroke-width:1.5}.e.p{stroke:var(--teal);stroke-width:5}
+.pl{font-size:12px;fill:var(--mut);text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--bg);stroke-width:5px}
+.n circle{fill:var(--node);stroke:var(--fg);stroke-width:1.5}
+.n text{fill:var(--fg);font-size:14px;font-weight:600;text-anchor:middle;dominant-baseline:central}
+.n.ex circle{fill:var(--tealbg);stroke:var(--teal)}
+.n.fr circle{stroke:var(--blue);stroke-width:4}
+.n.cur circle{fill:var(--amber);stroke:var(--amber)}.n.cur text{fill:#111}
+.n.path circle{fill:var(--teal);stroke:var(--teal)}.n.path text{fill:#fff}
+.tag{font-size:11px;font-weight:700;fill:var(--coral);text-anchor:middle}
+.leg{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--mut);margin:8px 0}
+.leg i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-2px;border:2px solid var(--fg);background:var(--node)}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-top:10px;font-size:14px}
+.panel b{font-weight:600}.lab{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-top:8px}
+.res{border-color:var(--teal);background:var(--tealbg)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px;min-width:560px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--bd)}th{color:var(--mut);font-weight:600}
+.ok{color:var(--teal);font-weight:700}.no{color:var(--coral);font-weight:700}
+</style>
+</head>
+<body>
+<main>
+<h1>Java flight route search</h1>
+<p class="sub">Pick a start, a goal and an algorithm, then step through the search. Prices are in thousand Rupiah.</p>
+<div class="ctl">
+<label>Start<select id="s"></select></label>
+<label>Goal<select id="g"></select></label>
+<label>Algorithm<select id="a"><option value="bfs">BFS (fewest flights)</option><option value="dfs">DFS (go deep, alphabetical order)</option><option value="ucs" selected>UCS (cheapest price)</option></select></label>
+</div>
+<div class="btns">
+<button id="rs">Reset</button><button id="pv">Previous</button><button id="nx" class="pri">Next step</button><button id="ls">Run to end</button>
+</div>
+<div class="gbox"><svg id="svg" viewBox="0 0 680 470" role="img" aria-label="Flight network across Java"></svg></div>
+<div class="leg"><span><i style="background:var(--amber);border-color:var(--amber)"></i>Being expanded</span><span><i style="border-color:var(--blue)"></i>In frontier</span><span><i style="background:var(--tealbg);border-color:var(--teal)"></i>Expanded</span><span><i style="background:var(--teal);border-color:var(--teal)"></i>Final path</span></div>
+<div class="panel" id="info"></div>
+<h2>All three algorithms on this trip</h2>
+<div class="panel tw" id="cmp"></div>
+</main>
+<script>
+const N={CGK:"Jakarta",BDO:"Bandung",SRG:"Semarang",YIA:"Yogyakarta",SUB:"Surabaya",MLG:"Malang",BWX:"Banyuwangi"};
+const P={CGK:[60,240],BDO:[190,50],SRG:[330,120],YIA:[190,400],SUB:[460,230],MLG:[460,400],BWX:[610,320]};
+const E=[["CGK","BDO",250,.5],["CGK","SRG",500,.72],["CGK","YIA",550,.5],["CGK","SUB",1000,.72],["BDO","YIA",300,.75],["SRG","SUB",400,.5],["YIA","SUB",450,.5],["YIA","MLG",600,.5],["SUB","MLG",200,.5],["SUB","BWX",700,.5],["MLG","BWX",300,.5]];
+const adj={},price={};
+E.forEach(([a,b,c])=>{(adj[a]=adj[a]||[]).push([b,c]);(adj[b]=adj[b]||[]).push([a,c]);price[a+b]=price[b+a]=c;});
+const pathOf=(par,g)=>{const p=[];for(let n=g;n;n=par[n])p.push(n);return p.reverse()};
+const costOf=p=>{let c=0;for(let i=1;i<p.length;i++)c+=price[p[i-1]+p[i]];return c};
+
+function run(alg,s,g){
+  const steps=[],par={[s]:null},expl=[];
+  const snap=o=>steps.push(Object.assign({expl:expl.slice()},o));
+  const fin=(note,cur)=>{const path=pathOf(par,g);snap({cur,front:[],fn:[],note,path});return{steps,path,cost:costOf(path),exp:expl.length}};
+  if(s===g)return fin("Start and goal are the same airport, so no flights are needed.",s);
+  if(alg==="bfs"){
+    const q=[s],seen=new Set([s]);
+    snap({cur:null,front:[s],fn:[s],note:"Start: put "+s+" in the queue."});
+    while(q.length){
+      const n=q.shift();expl.push(n);const add=[];
+      for(const [m] of adj[n]){
+        if(seen.has(m))continue;seen.add(m);par[m]=n;q.push(m);add.push(m);
+        if(m===g)return fin("Expand "+n+": "+m+" is the goal, found as soon as it is generated. Stop.",m);
+      }
+      snap({cur:n,front:q.slice(),fn:q.slice(),note:"Take "+n+" from the front of the queue. Added to the back: "+(add.join(", ")||"nothing new")+"."});
+    }
+  }else if(alg==="dfs"){
+    const st=[[s,null]],vis=new Set();
+    snap({cur:null,front:[s],fn:[s],note:"Start: push "+s+" onto the stack."});
+    while(st.length){
+      const [n,p]=st.pop();if(vis.has(n))continue;
+      vis.add(n);par[n]=p;
+      if(n===g)return fin("Pop "+n+": it is the goal. Stop.",n);
+      expl.push(n);
+      const ns=adj[n].map(x=>x[0]).filter(m=>!vis.has(m)).sort();
+      for(let i=ns.length-1;i>=0;i--)st.push([ns[i],n]);
+      const fr=st.map(x=>x[0]).filter(m=>!vis.has(m)).reverse();
+      snap({cur:n,front:fr,fn:fr,note:"Pop "+n+" from the top of the stack. Pushed in alphabetical order (the first one is popped next): "+(ns.join(", ")||"nothing, so this is a dead end and the search backtracks")+"."});
+    }
+  }else{
+    let fr=[[0,s]];const best={[s]:0};
+    snap({cur:null,front:[s+" 0"],fn:[s],note:"Start: put "+s+" in the priority queue with g = 0."});
+    while(fr.length){
+      fr.sort((a,b)=>a[0]-b[0]);
+      const [gv,n]=fr.shift();
+      if(n===g)return fin("Pop "+n+" (g = "+gv+"): it is the goal. Stop.",n);
+      expl.push(n);const ch=[];
+      for(const [m,c] of adj[n]){
+        if(expl.includes(m))continue;
+        const ng=gv+c;
+        if(best[m]===undefined||ng<best[m]){
+          const old=best[m];best[m]=ng;par[m]=n;
+          fr=fr.filter(x=>x[1]!==m);fr.push([ng,m]);
+          ch.push(old===undefined?m+" "+ng:m+" "+old+" \u2192 "+ng);
+        }
+      }
+      fr.sort((a,b)=>a[0]-b[0]);
+      snap({cur:n,front:fr.map(x=>x[1]+" "+x[0]),fn:fr.map(x=>x[1]),note:"Pop "+n+" (g = "+gv+"), the cheapest in the queue. "+(ch.length?"New or cheaper routes: "+ch.join(", ")+".":"No new or cheaper routes.")});
+    }
+  }
+  return{steps,path:[],cost:Infinity,exp:expl.length};
+}
+
+const $=id=>document.getElementById(id);
+const sS=$("s"),sG=$("g"),sA=$("a");
+Object.keys(N).forEach(k=>{[sS,sG].forEach(el=>el.add(new Option(k+" \u2013 "+N[k],k)))});
+sS.value="CGK";sG.value="BWX";
+
+let h="";
+E.forEach(([a,b])=>{
+  const [x1,y1]=P[a],[x2,y2]=P[b],d=Math.hypot(x2-x1,y2-y1),ux=(x2-x1)/d,uy=(y2-y1)/d,r=28;
+  h+='<line class="e" id="e-'+a+b+'" x1="'+(x1+ux*r)+'" y1="'+(y1+uy*r)+'" x2="'+(x2-ux*r)+'" y2="'+(y2-uy*r)+'"/>';
+});
+E.forEach(([a,b,c,t])=>{const x=P[a][0]+(P[b][0]-P[a][0])*t,y=P[a][1]+(P[b][1]-P[a][1])*t;h+='<text class="pl" x="'+x+'" y="'+y+'">'+c+'</text>'});
+Object.entries(P).forEach(([k,[x,y]])=>{
+  h+='<g class="n" id="n-'+k+'"><circle cx="'+x+'" cy="'+y+'" r="28"/><text x="'+x+'" y="'+y+'">'+k+'</text></g><text class="tag" id="t-'+k+'" x="'+x+'" y="'+(y+46)+'"></text>';
+});
+$("svg").innerHTML=h;
+
+let R,I=0;
+const edge=(a,b)=>$("e-"+a+b)||$("e-"+b+a);
+const labels={bfs:"Queue (next out first)",dfs:"Stack (next out first)",ucs:"Priority queue (lowest g first)"};
+function render(){
+  const st=R.steps[I],s=sS.value,g=sG.value,alg=sA.value,last=I===R.steps.length-1;
+  Object.keys(P).forEach(k=>{
+    let c="n";
+    if(st.expl.includes(k))c+=" ex";
+    if(st.fn&&st.fn.includes(k))c+=" fr";
+    if(st.cur===k)c+=" cur";
+    if(st.path&&st.path.includes(k))c+=" path";
+    $("n-"+k).setAttribute("class",c);
+    $("t-"+k).textContent=k===s&&k===g?"START / GOAL":k===s?"START":k===g?"GOAL":"";
+  });
+  E.forEach(([a,b])=>edge(a,b).setAttribute("class","e"));
+  if(st.path)for(let i=1;i<st.path.length;i++)edge(st.path[i-1],st.path[i]).setAttribute("class","e p");
+  let t='<b>Step '+(I+1)+' of '+R.steps.length+'.</b> '+st.note;
+  if(!last||!st.path){
+    t+='<div class="lab">'+labels[alg]+'</div>'+(st.front&&st.front.length?st.front.join(",  "):"empty");
+  }
+  t+='<div class="lab">Expanded so far</div>'+(st.expl.length?st.expl.join(", "):"none yet");
+  if(last&&st.path){
+    t+='<div class="panel res" style="margin-top:12px"><b>Result</b><br>Path: '+st.path.join(" \u2192 ")+'<br>Flights: '+(st.path.length-1)+' &nbsp;|&nbsp; Total price: <b>'+R.cost+'</b> &nbsp;|&nbsp; Nodes expanded: '+R.exp+'</div>';
+  }
+  $("info").innerHTML=t;
+  $("pv").disabled=I===0;$("nx").disabled=last;$("ls").disabled=last;$("rs").disabled=I===0;
+}
+function compare(){
+  const s=sS.value,g=sG.value,rs=["bfs","dfs","ucs"].map(a=>run(a,s,g)),best=rs[2].cost;
+  const nm={0:"BFS",1:"DFS",2:"UCS"};
+  let t='<table><tr><th>Algorithm</th><th>Path</th><th>Flights</th><th>Total price</th><th>Expanded</th><th>Cheapest?</th></tr>';
+  rs.forEach((r,i)=>{t+="<tr><td><b>"+nm[i]+"</b></td><td>"+r.path.join(" \u2192 ")+"</td><td>"+(r.path.length-1)+"</td><td>"+r.cost+"</td><td>"+r.exp+'</td><td class="'+(r.cost===best?"ok":"no")+'">'+(r.cost===best?"Yes":"No")+"</td></tr>"});
+  $("cmp").innerHTML=t+"</table>";
+}
+function setup(){R=run(sA.value,sS.value,sG.value);I=0;render();compare()}
+[sS,sG,sA].forEach(el=>el.onchange=setup);
+$("nx").onclick=()=>{if(I<R.steps.length-1){I++;render()}};
+$("pv").onclick=()=>{if(I>0){I--;render()}};
+$("ls").onclick=()=>{I=R.steps.length-1;render()};
+$("rs").onclick=()=>{I=0;render()};
+setup();
+</script>
+</body>
+</html>
