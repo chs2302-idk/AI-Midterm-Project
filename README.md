@@ -227,6 +227,30 @@ if __name__ == "__main__":
 
 ```
 
+## How to run
+ 
+### Step 1. Get the code
+Download this repository as a ZIP file and extract it, or clone it:
+ 
+```bash
+git clone https://github.com/chs2302-idk/AI-Midterm-Project.git
+cd AI-Midterm-Project
+```
+ 
+### Step 2. Open a terminal in the project folder
+- **Windows:** open the folder, click the address bar, type `cmd`, and press Enter.
+- **Mac / Linux:** open Terminal and use `cd` to go to the folder.
+### Step 3. Run one algorithm at a time
+ 
+```bash
+python BFS.py
+python dfs_flight_group6.py
+python ucs_flights.py
+```
+
+### Run in Google Colab (no installation)
+1. Go to [colab.research.google.com](https://colab.research.google.com) and create a new notebook.
+
 ## Experimental Results
 
 The three uninformed search algorithms were tested to find a route from Soekarno-Hatta International Airport (CGK) to Banyuwangi Airport (BWX).
