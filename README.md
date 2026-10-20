@@ -15,6 +15,41 @@ This project models a domestic flight network from CGK (Soekarno-Hatta Internati
 
 The project implements and compares three uninformed search algorithms: Breadth-First Search (BFS), Uniform-Cost Search (UCS), and Depth-First Search (DFS). The algorithms are evaluated based on the routes they find, total ticket costs, number of flights, expanded nodes, and execution time to understand the differences between their search strategies.
 
+
+**Objectives**
+The objectives of this project are:
+
+* To represent a domestic flight network as a weighted graph.
+
+* To implement Breadth-First Search (BFS), Uniform-Cost Search (UCS), and Depth-First Search (DFS).
+
+* To compare the routes produced by each algorithm based on total ticket cost and number of flights.
+
+* To evaluate algorithm performance using the number of expanded nodes and execution time.
+
+**Representation**
+
+<img width="1286" height="985" alt="WhatsApp Image 2026-10-20 at 8 00 05 AM" src="https://github.com/user-attachments/assets/38decb95-b518-4908-aa36-620d27128f5b" />
+
+
+The flight network is represented as a weighted graph consisting of seven airports:
+
+* CGK – Soekarno-Hatta, starting airport
+
+* BDO – Bandung
+
+* SRG – Semarang
+
+* YIA – Yogyakarta
+
+* SUB – Surabaya
+
+* MLG – Malang
+
+* BWX – Banyuwangi, the destination airport
+
+
+
 **Uniform Cost Search (UCS)**
 ```
 """Uniform Cost Search: cheapest flight route from Jakarta (CGK) to Banyuwangi (BWX).
@@ -76,7 +111,7 @@ if __name__ == "__main__":
     print("Expanded order:", ", ".join(expanded))
 ```
 
-**Algorithm Name**
+**Breadth-First Search (BFS)**
 
 ```
 Paste Here
