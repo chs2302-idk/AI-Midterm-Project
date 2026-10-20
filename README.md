@@ -273,6 +273,42 @@ The three uninformed search algorithms were tested to find a route from Soekarno
 
 Overall, BFS is useful for minimizing the number of flights, UCS is suitable for minimizing ticket costs, and DFS demonstrates how exploration order affects the route found.
 
+### Flight route demo
+1. The data
+
+The top of the script holds the problem itself: airport names (N), screen positions for drawing (P), and the 11 flights (E) with their prices. A loop turns the flights into an adjacency list (adj), which maps each airport to its neighbors and prices, and a price lookup (price) used later to add up costs. Each flight is stored in both directions.
+
+2. The run() function
+
+This is the core of the page. It takes the algorithm, start, and goal. It doesn’t draw anything. It runs the whole search and records a snapshot after every step. Each snapshot holds:
+
+the airport being expanded
+the frontier
+the list of airports expanded so far
+a sentence describing what happened
+
+At the end it adds the final path and total price. Stepping through the page just means moving through this list of snapshots, which is why Previous and Next both work.
+
+3. The three algorithms inside run()
+
+BFS uses a queue. It takes the airport at the front, adds its unseen neighbors to the back, and stops as soon as the goal is generated.
+DFS uses a stack. It pops the airport on top and pushes its unvisited neighbors in alphabetical order, so the first one is popped next. When an airport has no new neighbors, the next pop goes back to an older entry in the stack, which is the backtracking. It tests for the goal on pop.
+UCS keeps a list of [g, airport] pairs sorted by cost. It pops the cheapest, tests for the goal on pop, then adds each neighbor at g + price. If a neighbor is already waiting at a higher cost, the entry is replaced, which is how SUB changes from 1000 to 900.
+
+Each algorithm records parent links, so the final path is rebuilt by walking back from the goal, and the cost is summed from the price lookup.
+
+4. Drawing the graph
+
+A loop builds the SVG once: lines for flights (shortened so they stop at the circle edges), price labels, and a circle with a code for each airport. Each airport has its own element ID so it can be recolored later.
+
+5. render()
+
+For the current snapshot, render() sets a CSS class on each airport: expanded, in the frontier, being expanded, or on the final path. It colors the path edges, writes the START and GOAL tags, and fills the text panel. At the last step it adds the result box.
+
+6. Controls and comparison
+
+The dropdowns call setup(), which runs the search again from step 0. The buttons only change the step number I and call render(). compare() runs all three algorithms on the chosen trip and fills the table, marking an algorithm as cheapest if its price matches the UCS price, since UCS is optimal.
+
 ## Conclusion
 
 This project demonstrates how BFS, UCS, and DFS can find different routes in a domestic flight network. BFS finds a route with the fewest flights, while UCS finds the route with the lowest total ticket cost. DFS explores paths according to its search order and does not guarantee an optimal result.
